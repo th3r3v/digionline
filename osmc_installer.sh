@@ -42,6 +42,7 @@ Group=root
 Environment=PATH=/usr/bin:/usr/local/bin
 Environment=NODE_ENV=production
 WorkingDirectory=/home/osmc/digionline
+StandardOutput=null
 
 [Install]
 WantedBy=multi-user.target" > digionline.service
