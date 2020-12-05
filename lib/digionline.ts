@@ -49,7 +49,7 @@ class Digionline {
     private lastHello : Date;
     private player : Array<PlayerInterface> = [];
     private channel : ChannelInterface | null;
-    private userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.105 Safari/537.36';
+    private userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36';
 
     constructor(cb : () => void) {
         this.login(success => {
