@@ -1,4 +1,12 @@
 const CONFIG = {
+    /**
+     * bejelentkezesi adatok
+     */
+    login: {
+        email: '',
+        password: ''
+    },
+    
     webconnect: {
         // ennek az eszkoznek a domain vagy ip cime
         domain: 'localhost',
@@ -6,18 +14,11 @@ const CONFIG = {
         port: 9999
     },
     /**
-     * lq - alacsony minőség
-     * mq - közepes minőség
-     * hq - magas minőség
+     * lq - alacsony minoseg
+     * mq - közepes minoseg
+     * hq - magas minoseg
      */
     videoQuality: 'hq',
-    /**
-     * Bejelentkezesi adatok
-     */
-    login: {
-        email: '',
-        password: ''
-    },
     /**
      * EPG beallitasok
      */
