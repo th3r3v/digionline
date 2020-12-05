@@ -1,6 +1,6 @@
 {
   "name": "digionline",
-  "version": "2.2.4",
+  "version": "2.3.0",
   "description": "Digionline servlet",
   "main": "main.js",
   "scripts": {
@@ -9,21 +9,21 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/szabbenjamin/digionline.git"
+    "url": "git+https://github.com/droM4X/digionline.git"
   },
   "author": "Benjamin Szabo <szabbenjamin@gmail.com>",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/szabbenjamin/digionline/issues"
+    "url": "https://github.com/droM4X/digionline/issues"
   },
-  "homepage": "https://github.com/szabbenjamin/digionline#readme",
+  "homepage": "https://github.com/droM4X/digionline#readme",
   "dependencies": {
-    "@types/node": "^10.12.0",
-    "find-remove": "^2.0.1",
+    "@types/node": "^14.14.10",
+    "find-remove": "^2.0.3",
     "fs": "0.0.1-security",
-    "http": "0.0.0",
+    "http": "0.0.1-security",
     "jquery": "^3.5.1",
-    "jsdom": "^12.2.0",
-    "request": "^2.88.0"
+    "jsdom": "^16.4.0",
+    "request": "^2.88.2"
   }
 }

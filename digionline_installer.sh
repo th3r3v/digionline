@@ -21,6 +21,14 @@ cd $DIGIPATH
 npm start" > digionline.sh
 chmod +x digionline.sh
 
+echo "#!/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+cd $DIGIPATH
+systemctl stop digionline
+git pull origin master && tsc main.ts
+systemctl start digionline" > digionline_updater.sh
+chmod +x digionline_updater.sh
+
 npm install
 cp config.sample.ts config.ts
 
