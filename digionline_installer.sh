@@ -66,4 +66,5 @@ systemctl daemon-reload
 systemctl start digionline
 systemctl enable digionline
 
-echo "A telepites befejezodott.";
+echo "A telepites befejezodott. A service elindult."
+echo "Ellenorzes: systemctl status digionline"
