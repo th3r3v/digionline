@@ -4,7 +4,7 @@ Eredeti OMSC verzió + részletes leírás: https://github.com/szabbenjamin/digi
 
 --- 
 
-Telepítés:
+Telepítés debian/ubuntu/raspberry pi os rendszereken:
 * `sudo -s` vagy `su`
 * `wget https://drom4x.github.io/digionline/digionline_installer.sh`
 * `chmod +x digionline_installer.sh`

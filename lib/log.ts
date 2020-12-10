@@ -19,8 +19,8 @@ class Log {
     }
 
     public static janitor(): void {
-        Log.write("7 napnal regebbi logfajlok torlese...");
         findRemoveSync("log/", { extensions: [".log"], age: { seconds: 604800 } });
+        Log.write("Deleting log files which are older than 7 days successful");
 
         // naponta ismetlodhet
         setTimeout(function () {

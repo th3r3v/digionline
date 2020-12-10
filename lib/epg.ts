@@ -217,12 +217,12 @@ class Epg {
         const diffTime = CONFIG.epg.timeout * 60 * 60;
 
         if (CONFIG.epg.forceUpdate) {
-            Log.write('EPG kenyszeritett ujratoltese...');
+            Log.write('EPG force reloading...');
         } else if (Common.diffTime(new Date(), lastUpgrade) < diffTime) {
-            Log.write('EPG naprakesz');
+            Log.write('EPG is up-to-date');
             return;
         } else {
-            Log.write('EPG ujratoltese...');
+            Log.write('EPG reloading...');
         }
         FileHandler.writeFile('./epg.xml', '');
 
@@ -232,7 +232,7 @@ class Epg {
         const writeXml = () => {
             let content = this.getXmlContainer(epgChannels + epgPrograms);
             fs.writeFileSync('./epg.xml', content);
-            Log.write('epg.xml ujrairva');
+            Log.write('EPG file rewrite successful');
         };
 
         let channel_list_temp = self.collectedChannels.slice(0);
@@ -250,7 +250,7 @@ class Epg {
                 name            = channelElement.name,
                 id              = `id${channelElement.id}`;
 
-            Log.write(`EPG betoltese: ${name}...`)
+            Log.write(`EPG downloading: ${name}...`)
             if (typeof epgUrls[id] !== 'undefined') {
                 epgChannels += self.getChannelEpg(channelIndex, name);
                 self.loadEPG(epgUrls[id], function (shows) {
@@ -272,7 +272,7 @@ class Epg {
          * XML újragyártása beállított időközönként
          */
         setTimeout(function () {
-            Log.write('XML ujragyartasa...');
+            Log.write('EPG updating...');
             self.generateEpg();
         }, CONFIG.epg.timeout * 60 * 60 * 1000);
     }

@@ -71,7 +71,7 @@ class Digionline {
     }
 
     private login(cb : (success : boolean) => void) : void {
-        Log.write('Login digionline.hu');
+        Log.write('Login to digionline.hu');
         Common.request({
             uri: 'https://digionline.hu/login',
             method: 'GET',
@@ -98,7 +98,7 @@ Reszletek: https://github.com/szabbenjamin/digionline/issues/25
 #########################################
                 
                 `);
-                Log.error('Token hiba.');
+                Log.error('Token error.');
                 process.exit();
             }
 
@@ -122,7 +122,7 @@ Reszletek: https://github.com/szabbenjamin/digionline/issues/25
                         this.donateMeMsg();
                     }
                     else {
-                        Log.error(`Sikertelen belepes (helyes a felhasznalonev es jelszo?)`, '1');
+                        Log.error(`!!! Login error. (Check your account credentials)`, '1');
                     }
                     cb(loggedIn);
                 });
@@ -189,7 +189,7 @@ Reszletek: https://github.com/szabbenjamin/digionline/issues/25
     
             this.channelList.sort((a, b) => a.index - b.index);
 
-            Log.write(`Channels loaded`, this.channelList.length);
+            Log.write(`Channels loaded. Found channels:`, this.channelList.length);
             cb(this.channelList);
         });
     }
@@ -252,7 +252,7 @@ Reszletek: https://github.com/szabbenjamin/digionline/issues/25
             const playlistExtension = ".m3u8";
 
             if (response.indexOf('404 - Tartalom nem található') !== -1) {
-                Log.error('Channel id is not found.');
+                Log.error('!!! Error: Channel ID is not found.');
                 return;
             }
 
@@ -316,7 +316,7 @@ Reszletek: https://github.com/szabbenjamin/digionline/issues/25
 
         function searchChannel(streams: Array<string>, cb: (response: string) => void) {
             if (!streams.length) {
-                Log.error('Adashiba: a csatorna nem mukodik.');
+                Log.error('!!! Stream Error: No input given.');
                 cb('');
                 return;
             }
@@ -333,7 +333,7 @@ Reszletek: https://github.com/szabbenjamin/digionline/issues/25
                     cb(stream);
                 }
                 else {
-                    Log.write(`Adashiba: nincs jel!`, Common.getUrlVars(stream)['q']);
+                    Log.write(`!!! Stream Error: no input given!`, Common.getUrlVars(stream)['q']);
                     searchChannel(streams, cb);
                 }
             });
@@ -355,11 +355,11 @@ Reszletek: https://github.com/szabbenjamin/digionline/issues/25
                     loaded: new Date(),
                     response : response
                 };
-                Log.write('loaded from request', channelKey);
+                Log.write('Loaded from request', channelKey);
             });
         }
         else {
-            Log.write(`loaded from cache`, channelKey);
+            Log.write(`Loaded from cache`, channelKey);
             loadChannel(this.player[channelKey].response);
         }
     }
@@ -384,14 +384,15 @@ Reszletek: https://github.com/szabbenjamin/digionline/issues/25
                 }
             }, response => {
                 const r = JSON.parse(response);
-                Log.write(r);
                 if (Object(r).error === true) {
+		    Log.write('!!! Error', Object(r).message)
                     this.login(() => {
                         this.channel = null;
                         Log.write('Logged in');
                     });
-                }
-                Log.write('Hello packet sent...', response);
+                } else {
+                  Log.write('Keep-alive packet sent');
+		}
             });
             this.lastHello = new Date();
         }
