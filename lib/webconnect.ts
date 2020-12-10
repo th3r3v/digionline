@@ -36,16 +36,16 @@ class Webconnect {
     }
 
     private showServices (filesAllowed : Array<string>) : void {
-        Log.write('===Elerheto csatornalista formatumok kulso lejatszokhoz===');
+        Log.write('Available channel list formats for external players');
         for (let file of filesAllowed) {
-            Log.write(`http://${CONFIG.webconnect.domain}:${CONFIG.webconnect.port}${file}`);
+            Log.write(`--> http://${CONFIG.webconnect.domain}:${CONFIG.webconnect.port}${file}`);
         }
     }
 
     public listen() : void {
         try {
             this.server.listen(CONFIG.webconnect.port);
-            Log.write('Server is listening');
+            Log.write('Server is up and listening');
         } catch (e) {
             Log.error(e);
         }

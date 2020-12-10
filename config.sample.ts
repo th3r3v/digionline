@@ -5,8 +5,7 @@ const CONFIG = {
     login: {
         email: '',
         password: ''
-    },
-    
+    },    
     webconnect: {
         // ennek az eszkoznek a domain vagy ip cime
         domain: 'localhost',
