@@ -8,6 +8,7 @@ import Common from "./common";
 class Webconnect {
     private digi : Digionline;
     private server : any;
+    private currentChannel : number;
 
     public constructor() {
         const filesAllowed = [
@@ -58,8 +59,13 @@ class Webconnect {
     private getChannel(get : string, response : any) : void {
         const self = this;
         let id : number = Number(get.replace('/channel/', '').replace('.m3u8', ''));
-
+	
         Log.write(`GET channel ${id}`);
+
+	if (this.currentChannel !== id){
+         self.digi.hello(id, true);
+	 this.currentChannel = id;
+        }
 
         this.digi.getChannel(id, channel => {
             const channelUrl = channel.url.replace('https', 'http');
