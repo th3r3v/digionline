@@ -372,8 +372,8 @@ Reszletek: https://github.com/szabbenjamin/digionline/issues/25
      * kapcsolat fenntartása (kössz a segítséget! :D)
      * @param id
      */
-    public hello(id : number) : void {
-        if (Common.diffTime(new Date(), this.lastHello) > 30) {
+    public hello(id : number, force : boolean = false) : void {
+        if (Common.diffTime(new Date(), this.lastHello) >= 270 || force === true) {
             Common.request({
                 uri: `https://digionline.hu/refresh?id=${id}`,
                 method: 'GET',
