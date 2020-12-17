@@ -25,7 +25,7 @@ echo "#!/bin/bash
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 cd $DIGIPATH
 systemctl stop digionline
-git pull origin master && tsc main.ts
+git pull origin master && npm install && tsc main.ts
 systemctl start digionline" > digionline_updater.sh
 chmod +x digionline_updater.sh
 
