@@ -1,16 +1,9 @@
-/**
- * Ezt nem volt kedvem újraírni.
- * Majd talán egyszer ha ez is lehal :>
- *
- * Created by Ben
- * https://github.com/szabbenjamin/digionline
- */
 import Common from "./common";
 import CONFIG from "../config";
-import {ChannelInterface} from "./digionline";
 import Log from "./log";
 import FileHandler from "./file";
 
+const atob = require('atob');
 const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
 const { window } = new JSDOM(`<!DOCTYPE html>`);
@@ -22,34 +15,24 @@ const fs = require('fs');
 /**
  * Olvasnivalók:
  * https://en.wikipedia.org/wiki/Electronic_program_guide
- * http://kodi.wiki/view/Add-on:IPTV_Simple_Client
- *
+ * https://kodi.wiki/view/Add-on:PVR_IPTV_Simple_Client
+ * http://wiki.xmltv.org/index.php/XMLTVFormat
  */
 class Epg {
-    private channelEpgUrls : object = {};
     private channelTemplate : string;
     private programmeTemplate : string;
     private xmlContainer : string;
-    private collectedChannels : Array<ChannelInterface> = [];
-
+    private epgUrl: string = 'aHR0cHM6Ly9vbmxpbmUuZGlnaS5odS9hcGkvZXBnL2dldEVQR0FsbD9wbGF0Zm9ybT1BbmRyb2lkJmRhdGU9';
+    private epgFile: string = './epg.xml'
+    private epgTimeStampFile: string = './epg.timestamp';
 
     constructor () {
-        this.channelEpgUrls = FileHandler.readJsonFile('helpers/epg_channel_urls.json') as Object;
-
         /*
          * Template fájlok az xml generálásához
          */
         this.channelTemplate = '<channel id="id:id"><display-name lang="hu">:channelName</display-name></channel>\n';
-        this.programmeTemplate = '<programme start=":start :startOffset" stop=":end :endOffset" channel="id:id"><title lang="hu">:programme</title></programme>\n';
+        this.programmeTemplate = '<programme start=":start :startOffset" stop=":end :endOffset" channel="id:id"><title lang="hu">:programmeName</title><desc lang="hu">:programmeDesc</desc></programme>\n';
         this.xmlContainer = '<?xml version="1.0" encoding="utf-8" ?><tv>:content</tv>';
-    }
-
-    public setChannels (channelList : Array<ChannelInterface>) : void {
-        this.collectedChannels = channelList;
-    }
-
-    private getChannelEpgUrls () {
-        return this.channelEpgUrls;
     }
 
     private getXmlContainer (content) {
@@ -57,7 +40,7 @@ class Epg {
             .replace(':content', content);
     }
 
-    private getChannelEpg (id, channelName) {
+    private getChannelTemplate (id, channelName) {
         var channel = this.channelTemplate
             .replace(':id', id)
             .replace(':channelName', this.escapeXml(channelName));
@@ -75,7 +58,7 @@ class Epg {
         return correctDate;
     }
 
-    private getProgrammeTemplate (id, start, end, programme) {
+    private getProgrammeTemplate (id, start, end, programmeName, programmeDesc) {
         var startCorrect = this._applyTimeZoneCorrection(start);
 
         var endCorrect = this._applyTimeZoneCorrection(end);
@@ -87,7 +70,8 @@ class Epg {
             .replace(':id', id)
             .replace(':start', this.formatDate(startCorrect))
             .replace(':end', this.formatDate(endCorrect))
-            .replace(':programme', this.escapeXml(programme))
+            .replace(':programmeName', this.escapeXml(programmeName))
+            .replace(':programmeDesc', this.escapeXml(programmeDesc))
             .replace(':startOffset', '+0100')
             .replace(':endOffset', '+0100')
             ;
@@ -134,66 +118,27 @@ class Epg {
         });
     }
     
-    /**
-     * Műsorok letöltése
-     * @param epgUrl
-     * @param cb
-     */
-    private loadEPG(epgUrl, cb) {
+    private downloadEPG(cb) {
         let headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36',
-            'Content-Type' : 'application/x-www-form-urlencoded'
+            'User-Agent': 'okhttp/3.12.1',
+            'Content-Type' : 'text/json'
         };
+        let date = new Date().toISOString().split('T')[0];
 
-        let shows = [];
-
-        request.get(
-            epgUrl,
-            {
-                headers: headers
-            },
+        request.get(atob(this.epgUrl) + date, { headers: headers },
             function (error, response, body) {
+                if (!error && response.statusCode == 200){
+                    cb(body);
+                }
+            }
+        );
+    }
 
-                $.each($(body).find("section"), function(index, section) {
-                    /* A honlap eme "ajánló" elemeit el kell, hogy kerüljük, külünben
-                     * tetszőleges csatornákról kerülnének műsorok a listánkra! */
-                    let suggestionsToBeIgnored = $(section).find('[class="rotated-text rotated-to-be-seen_internal"]').html();
-
-                    if (typeof suggestionsToBeIgnored === 'undefined') {
-                        $.each($(section).find('[itemtype="https://schema.org/BroadcastEvent"]'), function (index, program) {
-                            let show = {
-                                startDate: $(program).find('[itemprop="startDate"]').attr('content'),
-                                name: $(program).find('[itemprop="name"] a').html(),
-                                description: $(program).find('[itemprop="description"]').html()
-                            };
-                            show.toString = function() {
-                                return "['" + show.startDate + "' '" + show.name + "' '" + show.description + "']";
-                            };
-
-                            /**
-                             * duplikációk megszüntetése
-                             */
-                            for (let i = 0; i < shows.length; i++) {
-                                let _startDate = shows[i].startDate;
-                                if (_startDate === show.startDate) {
-                                    return;
-                                }
-                            }
-
-                            shows.push(show);
-                        });
-                    }
-                });
-
-                // Rendezés
-                shows.sort(function (a, b) {
-                    a = new Date(a.startDate);
-                    b = new Date(b.startDate);
-                    return a < b ? -1 : a > b ? 1 : 0;
-                });
-
-                cb(shows);
-            });
+    private saveEPG(epgChannels, epgPrograms) {
+        let content = this.getXmlContainer(epgChannels + epgPrograms);
+        fs.writeFileSync(this.epgFile, content);
+        Log.write('EPG file rewrite successful');
+        fs.writeFileSync(this.epgTimeStampFile, (new Date()).toString());
     }
 
     /**
@@ -201,14 +146,10 @@ class Epg {
      */
     public generateEpg() {
         const self = this;
-        let epgChannels = '',
-            epgPrograms = '',
-            epgTimestampPath = './epg.timestamp',
-            epgUrls     = this.getChannelEpgUrls();
 
         let lastUpgrade;
         try {
-            lastUpgrade = new Date(fs.readFileSync(epgTimestampPath).toString());
+            lastUpgrade = new Date(fs.readFileSync(this.epgTimeStampFile).toString());
         } catch (e) {
             lastUpgrade = new Date('2000-01-01');
         }
@@ -224,49 +165,37 @@ class Epg {
         } else {
             Log.write('EPG reloading...');
         }
-        FileHandler.writeFile('./epg.xml', '');
+        FileHandler.writeFile(this.epgFile, '');
 
-        /**
-         * XML legyártása
-         */
-        const writeXml = () => {
-            let content = this.getXmlContainer(epgChannels + epgPrograms);
-            fs.writeFileSync('./epg.xml', content);
-            Log.write('EPG file rewrite successful');
-        };
 
-        let channel_list_temp = self.collectedChannels.slice(0);
-        let progress = setInterval(() => {
-            // Ha elfogyott vége a dalnak, mentjük az xml-t
-            if (channel_list_temp.length === 0) {
-                clearInterval(progress);
-                writeXml();
-                fs.writeFileSync(epgTimestampPath, (new Date()).toString());
-                return;
-            }
+        if (typeof this.epgUrl !== 'undefined') {
+            Log.write(`EPG processing...`);
 
-            let channelElement  = channel_list_temp.pop(),
-                channelIndex    = channelElement.id,
-                name            = channelElement.name,
-                id              = `id${channelElement.id}`;
+            self.downloadEPG(response => {
+                let epgChannels = '',
+                epgPrograms = '';
+                let epgData = JSON.parse(response);
 
-            Log.write(`EPG downloading: ${name}...`)
-            if (typeof epgUrls[id] !== 'undefined') {
-                epgChannels += self.getChannelEpg(channelIndex, name);
-                self.loadEPG(epgUrls[id], function (shows) {
-                    for (let i = 0; i < shows.length; i++) {
-                        let endStartDate = new Date(shows[i].startDate);
+                for (let i = 0; i < epgData.data.length; i++){
+                    epgChannels += self.getChannelTemplate(epgData.data[i].id_stream, epgData.data[i].stream_name);
+
+                    for (let j=0; j < epgData.data[i].epg.length; j++) {
+                        let channelData = epgData.data[i].epg[j];
+                        let programStartDate = new Date(channelData.start_ts * 1000);
+                        let programEndDate = new Date(channelData.end_ts * 1000);
                         epgPrograms += self.getProgrammeTemplate(
-                            channelIndex,
-                            shows[i].startDate,
-                            typeof shows[i+1] !== 'undefined'
-                                ? shows[i+1].startDate : endStartDate.setHours(endStartDate.getHours() + 1),
-                            shows[i].name + ' ' + shows[i].description
+                            epgData.data[i].id_stream,
+                            programStartDate,
+                            programEndDate,
+                            channelData.program_name + ' ' + channelData.program_description,
+                            channelData.program_description_l
                         );
                     }
-                });
-            }
-        }, 4 * 1000);
+                }
+                
+                this.saveEPG(epgChannels, epgPrograms);
+            });
+        }
 
         /**
          * XML újragyártása beállított időközönként

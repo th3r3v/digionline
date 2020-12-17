@@ -59,7 +59,6 @@ class Digionline {
                     this.generateChannelList();
                     if (CONFIG.epg.needle) {
                         const epgEngine = new Epg();
-                        epgEngine.setChannels(channelList);
                         epgEngine.generateEpg();
                     }
                 });
@@ -67,7 +66,7 @@ class Digionline {
         });
         this.lastHello = new Date();
         this.channel = null;
-        this.channelOrder = FileHandler.readJsonFile('helpers/epg_channel_urls.json') as Object;
+        this.channelOrder = FileHandler.readJsonFile('channels/channel_order.json') as Object;
     }
 
     private login(cb : (success : boolean) => void) : void {

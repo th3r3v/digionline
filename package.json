@@ -19,6 +19,7 @@
   "homepage": "https://github.com/droM4X/digionline#readme",
   "dependencies": {
     "@types/node": "^14.14.10",
+    "atob": "^2.1.2",
     "find-remove": "^2.0.3",
     "fs": "0.0.1-security",
     "http": "0.0.1-security",
