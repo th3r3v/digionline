@@ -27,7 +27,7 @@ const CONFIG = {
         // minden inditaskor generaljunk EPG-t?
         forceUpdate: false,
         // EPG idohatar oraban
-        timeout: 24
+        timeout: 12
     },
     /**
      * SSL biztonsagos kapcsolat hasznalata. Csak akkor kapcsold ki ha feltetlenul szukeges!
