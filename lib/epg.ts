@@ -8,9 +8,8 @@ const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
 const { window } = new JSDOM(`<!DOCTYPE html>`);
 const $ = require('jquery')(window);
-var request = require('request');
-var request = request.defaults({jar: true});
 const fs = require('fs');
+const fetch = require('node-fetch');
 
 /**
  * Olvasnivalók:
@@ -117,21 +116,42 @@ class Epg {
             }
         });
     }
-    
-    private downloadEPG(cb) {
+
+    private downloadEPG(date) {
         let headers = {
-            'User-Agent': 'okhttp/3.12.1',
+            'User-Agent': 'okhttp/3.12.12',
             'Content-Type' : 'text/json'
         };
-        let date = new Date().toISOString().split('T')[0];
 
-        request.get(atob(this.epgUrl) + date, { headers: headers },
-            function (error, response, body) {
-                if (!error && response.statusCode == 200){
-                    cb(body);
+        return fetch(atob(this.epgUrl) + date, { headers: headers })
+        .then(res => res.json())
+    }  
+
+    private getEPG(cb) {
+        let jsonToday, jsonTomorrow;
+
+        let today = new Date().toISOString().split('T')[0];
+        let tomorrow = new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
+        const promiseToday = this.downloadEPG(today)
+            .then(res => {jsonToday = res});
+
+        const promiseTomorrow = this.downloadEPG(tomorrow)
+            .then(res => {jsonTomorrow = res});
+
+        Promise.all([promiseToday, promiseTomorrow])
+            .then(
+                () => {
+                    for(let i = 0; i < jsonToday.data.length; i++){
+                        for (let j = 0; j < jsonTomorrow.data.length; j++){
+                            if (jsonToday.data[i].id_stream == jsonTomorrow.data[j].id_stream){
+                                jsonToday.data[i].epg = jsonToday.data[i].epg.concat(jsonTomorrow.data[j].epg);
+                            }
+                        }
+                    }
+                    cb(jsonToday);
                 }
-            }
-        );
+            );
     }
 
     private saveEPG(epgChannels, epgPrograms) {
@@ -167,14 +187,12 @@ class Epg {
         }
         FileHandler.writeFile(this.epgFile, '');
 
-
         if (typeof this.epgUrl !== 'undefined') {
             Log.write(`EPG processing...`);
 
-            self.downloadEPG(response => {
+            self.getEPG(epgData => {
                 let epgChannels = '',
                 epgPrograms = '';
-                let epgData = JSON.parse(response);
 
                 for (let i = 0; i < epgData.data.length; i++){
                     epgChannels += self.getChannelTemplate(epgData.data[i].id_stream, epgData.data[i].stream_name);

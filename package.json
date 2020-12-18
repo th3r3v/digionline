@@ -1,6 +1,6 @@
 {
   "name": "digionline",
-  "version": "2.4.0",
+  "version": "2.4.1",
   "description": "Digionline servlet",
   "main": "main.js",
   "scripts": {
@@ -25,6 +25,7 @@
     "http": "0.0.1-security",
     "jquery": "^3.5.1",
     "jsdom": "^16.4.0",
+    "node-fetch": "^2.6.1",
     "request": "^2.88.2"
   }
 }
