@@ -44,7 +44,7 @@ function getCategoryMapping(categories : HTMLSelectElement) : ChannelCategoryDic
 }
 
 class Digionline {
-    private channelOrder : object = {};
+    public channelOrder : object = {};
     private channelList : Array<ChannelInterface> = [];
     private lastHello : Date;
     private player : Array<PlayerInterface> = [];
@@ -241,7 +241,9 @@ Reszletek: https://github.com/szabbenjamin/digionline/issues/25
 
     public getChannel(id, cb : (channel : ChannelInterface) => void) : void {
         if (this.channel && this.channel.id === id) {
-            Log.write('Channel full cache', id, this.channel.name);
+            if (CONFIG.log.level === 'full'){
+                Log.write('Channel full cache', id, this.channel.name);
+            }
             cb(this.getStampedChannel());
             return;
         }
@@ -354,11 +356,15 @@ Reszletek: https://github.com/szabbenjamin/digionline/issues/25
                     loaded: new Date(),
                     response : response
                 };
-                Log.write('Loaded from request', channelKey);
+                if (CONFIG.log.level === 'full'){
+                    Log.write('Loaded from request', channelKey);
+                }
             });
         }
         else {
-            Log.write(`Loaded from cache`, channelKey);
+            if (CONFIG.log.level === 'full'){
+                Log.write(`Loaded from cache`, channelKey);
+            }
             loadChannel(this.player[channelKey].response);
         }
     }

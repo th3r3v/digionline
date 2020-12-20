@@ -24,10 +24,12 @@ const CONFIG = {
     epg: {
         // true ha szuksegunk van EPG-re; false ha nem
         needle: true,
-        // minden inditaskor generaljunk EPG-t?
-        forceUpdate: false,
-        // EPG idohatar oraban
-        timeout: 12
+    },
+    log: {
+        // mit logoljuk? 
+        // minimal = hibak, bejelentkezes, csatorna lejatszas
+        // full = minimal + elotoltesi infok
+        level: 'minimal'
     },
     /**
      * SSL biztonsagos kapcsolat hasznalata. Csak akkor kapcsold ki ha feltetlenul szukeges!

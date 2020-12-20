@@ -59,12 +59,17 @@ class Webconnect {
     private getChannel(get : string, response : any) : void {
         const self = this;
         let id : number = Number(get.replace('/channel/', '').replace('.m3u8', ''));
-	
-        Log.write(`GET channel ${id}`);
+        let channelId : string = 'id'+id;
+        let channelName: string = this.digi.channelOrder[channelId];
+    
+        if (CONFIG.log.level === 'full'){
+            Log.write(`GET channel ${channelName} (${id})`);
+        }
 
-	if (this.currentChannel !== id){
-         self.digi.hello(id, true);
-	 this.currentChannel = id;
+        if (this.currentChannel !== id){
+            Log.write(`Channel change to ${channelName} (${id})`);
+            self.digi.hello(id, true);
+            this.currentChannel = id;
         }
 
         this.digi.getChannel(id, channel => {
@@ -73,11 +78,15 @@ class Webconnect {
                 let data = '';
                 proxyRes.on('data', function (chunk) {
                     data += chunk;
-                    Log.write('Buffering...', channel.id, channel.name, Common.getUrlVars(channel.url)['q']);
+                    if (CONFIG.log.level === 'full'){
+                        Log.write('Buffering...', channel.id, channel.name, Common.getUrlVars(channel.url)['q']);
+                    }
                 });
                 proxyRes.on('end', function () {
                     response.end(data);
-                    Log.write('Playing...', channel.id, channel.name, Common.getUrlVars(channel.url)['q']);
+                    if (CONFIG.log.level === 'full'){
+                        Log.write('Playing...', channel.id, channel.name, Common.getUrlVars(channel.url)['q']);
+                    }
                     self.digi.hello(channel.id);
                 });
                 proxyRes.on('error', function () {
@@ -88,7 +97,9 @@ class Webconnect {
     }
 
     private getFile(get: string, response : any) : void {
-        Log.write('file webrequested', get);
+        if (CONFIG.log.level === 'full'){
+            Log.write('file webrequested', get);
+        }
         const fileContent = FileHandler.readFile(`.${get}`).toString();
         response.write(fileContent);
         response.end();

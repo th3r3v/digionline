@@ -168,23 +168,20 @@ class Epg {
         const self = this;
 
         let lastUpgrade;
+
         try {
             lastUpgrade = new Date(fs.readFileSync(this.epgTimeStampFile).toString());
         } catch (e) {
             lastUpgrade = new Date('2000-01-01');
         }
 
-        // XML outdate idő órában számítva
-        const diffTime = CONFIG.epg.timeout * 60 * 60;
-
-        if (CONFIG.epg.forceUpdate) {
-            Log.write('EPG force reloading...');
-        } else if (Common.diffTime(new Date(), lastUpgrade) < diffTime) {
+        if (Common.diffTime(new Date(), lastUpgrade) < 8 * 60 * 60) {
             Log.write('EPG is up-to-date');
             return;
         } else {
             Log.write('EPG reloading...');
         }
+
         FileHandler.writeFile(this.epgFile, '');
 
         if (typeof this.epgUrl !== 'undefined') {
@@ -214,14 +211,6 @@ class Epg {
                 this.saveEPG(epgChannels, epgPrograms);
             });
         }
-
-        /**
-         * XML újragyártása beállított időközönként
-         */
-        setTimeout(function () {
-            Log.write('EPG updating...');
-            self.generateEpg();
-        }, CONFIG.epg.timeout * 60 * 60 * 1000);
     }
 }
 
