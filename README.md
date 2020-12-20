@@ -10,5 +10,12 @@ Telepítés debian/ubuntu/raspberry pi os rendszereken:
 * `chmod +x digionline_installer.sh`
 * `./digionline_installer.sh`
 
-Heti automatikus frissítés (cron):
-`10 4 * * 0 root <utvonal>/digionline_updater.sh >/dev/null 2>&1`
+---
+
+_CRON JOBOK_
+
+EPG ujrageneralas 12 orankent:
+`30 */12 * * * <user> <path>/digionline.epgUpdater.sh >/dev/null 2>&1`
+
+Heti automatikus frissítés:
+`10 4 * * 0 root <path>/digionline_updater.sh >/dev/null 2>&1`
