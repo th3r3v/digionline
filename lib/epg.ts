@@ -18,14 +18,14 @@ const fetch = require('node-fetch');
  * http://wiki.xmltv.org/index.php/XMLTVFormat
  */
 class Epg {
-    private channelTemplate : string;
-    private programmeTemplate : string;
-    private xmlContainer : string;
+    private channelTemplate: string;
+    private programmeTemplate: string;
+    private xmlContainer: string;
     private epgUrl: string = 'aHR0cHM6Ly9vbmxpbmUuZGlnaS5odS9hcGkvZXBnL2dldEVQR0FsbD9wbGF0Zm9ybT1BbmRyb2lkJmRhdGU9';
     private epgFile: string = './epg.xml'
     private epgTimeStampFile: string = './epg.timestamp';
 
-    constructor () {
+    constructor() {
         /*
          * Template fájlok az xml generálásához
          */
@@ -34,12 +34,12 @@ class Epg {
         this.xmlContainer = '<?xml version="1.0" encoding="utf-8" ?><tv>:content</tv>';
     }
 
-    private getXmlContainer (content) {
+    private getXmlContainer(content) {
         return this.xmlContainer
             .replace(':content', content);
     }
 
-    private getChannelTemplate (id, channelName) {
+    private getChannelTemplate(id, channelName) {
         var channel = this.channelTemplate
             .replace(':id', id)
             .replace(':channelName', this.escapeXml(channelName));
@@ -47,7 +47,7 @@ class Epg {
         return channel;
     }
 
-    private _applyTimeZoneCorrection (originalDate) {
+    private _applyTimeZoneCorrection(originalDate) {
         let correctDate = new Date(originalDate);
 
         // időzóna korrekció
@@ -57,7 +57,7 @@ class Epg {
         return correctDate;
     }
 
-    private getProgrammeTemplate (id, start, end, programmeName, programmeDesc) {
+    private getProgrammeTemplate(id, start, end, programmeName, programmeDesc) {
         var startCorrect = this._applyTimeZoneCorrection(start);
 
         var endCorrect = this._applyTimeZoneCorrection(end);
@@ -76,43 +76,43 @@ class Epg {
             ;
     }
 
-    private formatDate (date) {
-        let d       = new Date(date);
-        let year    = d.getFullYear();
-        let month : any   = d.getMonth()+1;
-        let day : any    = d.getDate();
-        let hour : any   = d.getHours();
-        let minute : any = d.getMinutes();
-        let second : any = d.getSeconds();
+    private formatDate(date) {
+        let d = new Date(date);
+        let year = d.getFullYear();
+        let month: any = d.getMonth() + 1;
+        let day: any = d.getDate();
+        let hour: any = d.getHours();
+        let minute: any = d.getMinutes();
+        let second: any = d.getSeconds();
 
         if (month.toString().length == 1) {
             month = '0' + month;
         }
         if (day.toString().length == 1) {
-            day = '0'+day;
+            day = '0' + day;
         }
         if (hour.toString().length == 1) {
-            hour = '0'+hour;
+            hour = '0' + hour;
         }
         if (minute.toString().length == 1) {
-            minute = '0'+minute;
+            minute = '0' + minute;
         }
         if (second.toString().length == 1) {
-            second = '0'+second;
+            second = '0' + second;
         }
 
-        return '' + year+month+day+hour+minute+second;
+        return '' + year + month + day + hour + minute + second;
     }
 
     // https://stackoverflow.com/questions/7918868/how-to-escape-xml-entities-in-javascript
     private escapeXml(unsafestr: string) {
         return unsafestr.replace(/[<>&'"]/g, function (c) {
-        switch (c) {
-            case '<': return '&lt;';
-            case '>': return '&gt;';
-            case '&': return '&amp;';
-            case '\'': return '&apos;';
-            case '"': return '&quot;';
+            switch (c) {
+                case '<': return '&lt;';
+                case '>': return '&gt;';
+                case '&': return '&amp;';
+                case '\'': return '&apos;';
+                case '"': return '&quot;';
             }
         });
     }
@@ -120,12 +120,12 @@ class Epg {
     private downloadEPG(date) {
         let headers = {
             'User-Agent': 'okhttp/3.12.12',
-            'Content-Type' : 'text/json'
+            'Content-Type': 'text/json'
         };
 
         return fetch(atob(this.epgUrl) + date, { headers: headers })
-        .then(res => res.json())
-    }  
+            .then(res => res.json())
+    }
 
     private getEPG(cb) {
         let jsonToday, jsonTomorrow;
@@ -134,17 +134,17 @@ class Epg {
         let tomorrow = new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
         const promiseToday = this.downloadEPG(today)
-            .then(res => {jsonToday = res});
+            .then(res => { jsonToday = res });
 
         const promiseTomorrow = this.downloadEPG(tomorrow)
-            .then(res => {jsonTomorrow = res});
+            .then(res => { jsonTomorrow = res });
 
         Promise.all([promiseToday, promiseTomorrow])
             .then(
                 () => {
-                    for(let i = 0; i < jsonToday.data.length; i++){
-                        for (let j = 0; j < jsonTomorrow.data.length; j++){
-                            if (jsonToday.data[i].id_stream == jsonTomorrow.data[j].id_stream){
+                    for (let i = 0; i < jsonToday.data.length; i++) {
+                        for (let j = 0; j < jsonTomorrow.data.length; j++) {
+                            if (jsonToday.data[i].id_stream == jsonTomorrow.data[j].id_stream) {
                                 jsonToday.data[i].epg = jsonToday.data[i].epg.concat(jsonTomorrow.data[j].epg);
                             }
                         }
@@ -189,12 +189,12 @@ class Epg {
 
             self.getEPG(epgData => {
                 let epgChannels = '',
-                epgPrograms = '';
+                    epgPrograms = '';
 
-                for (let i = 0; i < epgData.data.length; i++){
+                for (let i = 0; i < epgData.data.length; i++) {
                     epgChannels += self.getChannelTemplate(epgData.data[i].id_stream, epgData.data[i].stream_name);
 
-                    for (let j=0; j < epgData.data[i].epg.length; j++) {
+                    for (let j = 0; j < epgData.data[i].epg.length; j++) {
                         let channelData = epgData.data[i].epg[j];
                         let programStartDate = new Date(channelData.start_ts * 1000);
                         let programEndDate = new Date(channelData.end_ts * 1000);
@@ -207,7 +207,7 @@ class Epg {
                         );
                     }
                 }
-                
+
                 this.saveEPG(epgChannels, epgPrograms);
             });
         }
