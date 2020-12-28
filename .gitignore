@@ -78,3 +78,5 @@ epg.timestamp
 epg.xml
 digionline.sh
 digionline.service
+channels/channel_order.json
+channels/channel_hide.json

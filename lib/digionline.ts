@@ -67,8 +67,8 @@ class Digionline {
         });
         this.lastHello = new Date();
         this.channel = null;
-        this.channelOrder = FileHandler.readJsonFile('channels/channel_order.json') as Object;
-        this.channelHide = FileHandler.readJsonFile('channels/channel_hide.json') as Object;
+        this.channelOrder = FileHandler.getChannelConfigFile('channels/channel_order.json', 'channels/channel_order.dist.json') as Object;
+        this.channelHide = FileHandler.getChannelConfigFile('channels/channel_hide.json', 'channels/channel_hide.dist.json') as Object;
     }
 
     private login(cb: (success: boolean) => void): void {
