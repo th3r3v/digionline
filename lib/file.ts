@@ -11,6 +11,16 @@ class FileHandler {
         return JSON.parse(filecontent);
     }
 
+    public static getChannelConfigFile (filename: string, fallbackFilename: string): object {
+        if (fs.existsSync(filename)) {
+	    Log.write('Loading local channel config: ', filename);
+	    return FileHandler.readJsonFile(filename);
+        } else {
+	    Log.write('Loading dist channel config: ', fallbackFilename);
+            return FileHandler.readJsonFile(fallbackFilename);
+        }
+    }
+
     public static writeFile (filename : string, input : string) : void {
         if (typeof input !== 'string') {
             Log.write('Input type is invalid');
