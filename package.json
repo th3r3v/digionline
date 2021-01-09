@@ -1,6 +1,6 @@
 {
   "name": "digionline",
-  "version": "2.6.2",
+  "version": "2.6.3",
   "description": "Digionline servlet",
   "main": "main.js",
   "scripts": {
@@ -18,7 +18,7 @@
   },
   "homepage": "https://github.com/droM4X/digionline#readme",
   "dependencies": {
-    "@types/node": "^14.14.14",
+    "@types/node": "^14.14.20",
     "atob": "^2.1.2",
     "find-remove": "^2.0.3",
     "fs": "0.0.1-security",
