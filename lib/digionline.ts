@@ -304,7 +304,7 @@ Reszletek: https://github.com/szabbenjamin/digionline/issues/25
                         'User-Agent': this.userAgent
                     }
                 }, response => {
-                    if (response.length < 10) {
+                    if (response && response.length < 10) {
                         searchChannel(streams, response => {
                             channel.url = response;
                             this.channel = channel;
@@ -334,7 +334,7 @@ Reszletek: https://github.com/szabbenjamin/digionline/issues/25
                     'User-Agent': this.userAgent
                 }
             }, response => {
-                if (response.length > 10) {
+                if (response && response.length > 10) {
                     cb(stream);
                 }
                 else {

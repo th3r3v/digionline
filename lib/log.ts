@@ -1,3 +1,4 @@
+import CONFIG from "../config";
 import FileHandler from "./file";
 const findRemoveSync = require("find-remove");
 
@@ -7,7 +8,10 @@ class Log {
         const isoDateString = today.toISOString().substring(0, 10);
 
         console.log((new Date()).toString(), input);
-        FileHandler.appendFile(`log/${isoDateString}.log`, `${(new Date()).toString()} # ${JSON.stringify(input)}`);
+        
+        if (CONFIG.log.level !== 'stdout') {
+            FileHandler.appendFile(`log/${isoDateString}.log`, `${(new Date()).toString()} # ${JSON.stringify(input)}`);
+        }
     }
 
     public static error (...input) : void {

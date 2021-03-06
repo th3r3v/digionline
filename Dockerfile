@@ -18,6 +18,8 @@ RUN cp config.sample.ts config.ts && \
     sed -i "s/email: ''/email: process.env.EMAIL/" config.ts && \
 # Replace empty email with environment variable PASSWORD
     sed -i "s/password: ''/password: process.env.PASSWORD/" config.ts && \
+# Replace logging level to stdout instead of local logging
+    sed -i "s/level: 'minimal'/level: 'stdout'/" config.ts && \
 # Install production only dependencies
     npm install --only=production && \
 # Install typescript for conversion
@@ -26,8 +28,6 @@ RUN cp config.sample.ts config.ts && \
     npx tsc main.ts && \
 # Create epg.xml
     touch epg.xml
-
-RUN mkdir log
 
 EXPOSE 9999
 CMD [ "npm", "start" ]
