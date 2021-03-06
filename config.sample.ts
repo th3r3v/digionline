@@ -27,6 +27,7 @@ const CONFIG = {
     },
     log: {
         // mit logoljuk? 
+        // stdout = csak a kimenetre (docker mod)
         // minimal = hibak, bejelentkezes, csatorna lejatszas
         // full = minimal + elotoltesi infok
         level: 'minimal'
