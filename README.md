@@ -24,4 +24,4 @@ Image:
 Container:
 `sudo docker run -d -p 9999:9999 --restart unless-stopped --env DOMAIN=IP_vagy_DOMAIN --env EMAIL=user@domain.hu --env PASSWORD=jelszo --name digionline digionline`
 
-Az epg updatelese minden nap hajnali 2-kor tortenik.
+Az epg automatikusan frissul 12 orankent.

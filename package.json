@@ -1,6 +1,6 @@
 {
   "name": "digionline",
-  "version": "2.6.7",
+  "version": "2.7.0",
   "description": "Digionline servlet",
   "main": "main.js",
   "scripts": {
@@ -11,7 +11,7 @@
     "type": "git",
     "url": "git+https://github.com/droM4X/digionline.git"
   },
-  "author": "Benjamin Szabo <szabbenjamin@gmail.com>",
+  "author": "Gabor Lengyel <csuwwi@gmail.com>",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/droM4X/digionline/issues"
