@@ -211,6 +211,14 @@ class Epg {
                 this.saveEPG(epgChannels, epgPrograms);
             });
         }
+
+	if (CONFIG.mode === 'docker'){
+            setTimeout(function () {
+                Log.write('EPG refreshing...');
+                self.generateEpg();
+            }, 12 * 60 * 60 * 1000);
+        }
+
     }
 }
 

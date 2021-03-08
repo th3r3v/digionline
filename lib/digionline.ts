@@ -120,7 +120,6 @@ Reszletek: https://github.com/szabbenjamin/digionline/issues/25
                 this.checkLoggedIn(loggedIn => {
                     if (loggedIn) {
                         Log.write(`Logged in: ${CONFIG.login.email}`);
-                        this.donateMeMsg();
                     }
                     else {
                         Log.error(`!!! Login error. (Check your account credentials)`, '1');
@@ -371,10 +370,6 @@ Reszletek: https://github.com/szabbenjamin/digionline/issues/25
             }
             loadChannel(this.player[channelKey].response);
         }
-    }
-
-    private donateMeMsg(): void {
-        console.log('@\n@\n@\n@\n@ Ha támogatni szeretnéd a munkámat (vagy meg szeretnél hívni egy sörre, kávéra) Paypal-on van erre lehetőséged: https://paypal.me/dicsportal\n@\n@\n@');
     }
 
     /**

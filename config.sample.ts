@@ -13,6 +13,12 @@ const CONFIG = {
         port: 9999
     },
     /**
+     * futtatasi mod: 
+     * standalone - normal mod
+     * docker - docker mod
+     */
+    mode: 'standalone',
+    /**
      * lq - alacsony minoseg
      * mq - közepes minoseg
      * hq - magas minoseg
