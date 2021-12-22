@@ -65,4 +65,4 @@ Az EPG a digi saját listáját használja, így új csatorna megjelenése eset�
 
 __VLC__: Fájl > Hálózat megnyitása (a fenti adáslista fájl hozzáadása)
 
-__Kodival__: Szükséges PVR kliens [IPTV Simple Client](https://kodi.wiki/view/Add-on:PVR_IPTV_Simple_Client), telepítés után meg kell adni az m3u8 adáslista fájlt és az EPG linkjeit, az EPG-nél szükség esetén korrigálni az időeltolódást.
+__Kodi__: Szükséges PVR kliens [IPTV Simple Client](https://kodi.wiki/view/Add-on:PVR_IPTV_Simple_Client), telepítés után meg kell adni az IPTV adáslista fájlt és az EPG linkjeit, az EPG-nél szükség esetén korrigálni az időeltolódást.
