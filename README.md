@@ -58,4 +58,4 @@ http://[IP_vagy_DOMAIN]:9999/epg.xml
 
 __VLC-vel__: Fájl > Hálózat megnyitása > adáslista fájl hozzáadása
 
-__Kodival__: Szükséges PVR kliens [IPTV Simple Client](https://kodi.wiki/view/Add-on:PVR_IPTV_Simple_Client), telepítés után kell adni az adáslista és az epg linkjeit, az EPG-nél szükség esetén korrigálni az időeltolódást.
+__Kodival__: Szükséges PVR kliens [IPTV Simple Client](https://kodi.wiki/view/Add-on:PVR_IPTV_Simple_Client), telepítés után meg kell adni az adáslista és az EPG linkjeit, az EPG-nél szükség esetén korrigálni az időeltolódást.
