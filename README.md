@@ -63,6 +63,6 @@ Az EPG a digi saját listáját használja, így új csatorna megjelenése eset�
 
 ## Használat
 
-__VLC__: Fájl > Hálózat megnyitása (a fenti adáslista fájl hozzáadása)
+__VLC__: Fájl > Hálózat megnyitása (a fenti IPTV adáslista fájl hozzáadása)
 
 __Kodi__: Szükséges PVR kliens [IPTV Simple Client](https://kodi.wiki/view/Add-on:PVR_IPTV_Simple_Client), telepítés után meg kell adni az IPTV adáslista fájlt és az EPG linkjeit, az EPG-nél szükség esetén korrigálni az időeltolódást.
