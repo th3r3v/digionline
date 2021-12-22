@@ -106,15 +106,18 @@ class Epg {
 
     // https://stackoverflow.com/questions/7918868/how-to-escape-xml-entities-in-javascript
     private escapeXml(unsafestr: string) {
-        return unsafestr.replace(/[<>&'"]/g, function (c) {
-            switch (c) {
-                case '<': return '&lt;';
-                case '>': return '&gt;';
-                case '&': return '&amp;';
-                case '\'': return '&apos;';
-                case '"': return '&quot;';
-            }
-        });
+        if (unsafestr){
+            return unsafestr.replace(/[<>&'"]/g, function (c) {
+                switch (c) {
+                    case '<': return '&lt;';
+                    case '>': return '&gt;';
+                    case '&': return '&amp;';
+                    case '\'': return '&apos;';
+                    case '"': return '&quot;';
+                }
+            });
+        }
+        return "";
     }
 
     private downloadEPG(date) {
