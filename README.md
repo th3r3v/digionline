@@ -51,11 +51,11 @@ Az epg automatikusan frissül 12 óránként.
 ```
 http://[IP_vagy_DOMAIN]:9999/channels_IPTV.m3u8
 ```
-#### Epg
+#### EPG (műsorújság)
 ```
 http://[IP_vagy_DOMAIN]:9999/epg.xml
 ```
 
-__VLC-vel__: Fájl > Hálózat megnyitása > adáslista fájl hozzáadása
+__VLC-vel__: Fájl > Hálózat megnyitása (a fenti adáslista fájl hozzáadása)
 
 __Kodival__: Szükséges PVR kliens [IPTV Simple Client](https://kodi.wiki/view/Add-on:PVR_IPTV_Simple_Client), telepítés után meg kell adni az adáslista és az EPG linkjeit, az EPG-nél szükség esetén korrigálni az időeltolódást.
