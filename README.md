@@ -45,17 +45,24 @@ docker run -d -p 9999:9999 --restart unless-stopped --env DOMAIN=IP_vagy_DOMAIN 
 
 Az epg automatikusan frissül 12 óránként.
 
-## Használat
+## Kimenetek
 
-#### Adáslista fájl (.m3u8)
+#### IPTV adáslista fájl
 ```
 http://[IP_vagy_DOMAIN]:9999/channels_IPTV.m3u8
+```
+#### TVheadend adáslista fájl
+```
+http://[IP_vagy_DOMAIN]:9999/channels_tvheadend.m3u8
 ```
 #### EPG (műsorújság)
 ```
 http://[IP_vagy_DOMAIN]:9999/epg.xml
 ```
+Az EPG a digi saját listáját használja, így új csatorna megjelenése esetén is frissül, illetve csak az van benne, amilyen adást el lehet érni náluk. Az EPG frissülési ideje kb. 2mp, szemben az eredeti verzió 5-10 percével ;)
 
-__VLC-vel__: Fájl > Hálózat megnyitása (a fenti adáslista fájl hozzáadása)
+## Használat
 
-__Kodival__: Szükséges PVR kliens [IPTV Simple Client](https://kodi.wiki/view/Add-on:PVR_IPTV_Simple_Client), telepítés után meg kell adni az adáslista és az EPG linkjeit, az EPG-nél szükség esetén korrigálni az időeltolódást.
+__VLC__: Fájl > Hálózat megnyitása (a fenti adáslista fájl hozzáadása)
+
+__Kodival__: Szükséges PVR kliens [IPTV Simple Client](https://kodi.wiki/view/Add-on:PVR_IPTV_Simple_Client), telepítés után meg kell adni az m3u8 adáslista fájlt és az EPG linkjeit, az EPG-nél szükség esetén korrigálni az időeltolódást.
