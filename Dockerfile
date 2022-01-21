@@ -28,6 +28,7 @@ RUN cp config.sample.ts config.ts && \
     touch epg.xml
 
 EXPOSE 9999
+HEALTHCHECK --interval=5m --timeout=3s CMD wget --no-verbose --tries=1 --spider http://localhost:9999 || exit 1
 CMD [ "npm", "start" ]
 
 # Build docker image:
