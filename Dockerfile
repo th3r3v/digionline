@@ -28,6 +28,6 @@ RUN cp config.sample.ts config.ts && \
     touch epg.xml
 
 EXPOSE 9999
-HEALTHCHECK --timeout=3s CMD wget --no-verbose --tries=1 --spider http://localhost:9999 || exit 1
+HEALTHCHECK --timeout=3s CMD wget --no-verbose --tries=1 --spider http://localhost:9999/channels.csv || exit 1
 CMD [ "npm", "start" ]
 
