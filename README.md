@@ -1,7 +1,46 @@
-# DIGI online servlet (debian standalone / docker)
-Eredeti OMSC verzió + részletes leírás: https://github.com/szabbenjamin/digionline/
+# DIGI online servlet
+Ez egy forkja az eredeti verziónak, jobb docker támogatottsággal és gyorsabb EPG-vel.
+
+Az eredeti OMSC verzió + részletes leírást itt találod: https://github.com/szabbenjamin/digionline/
+
+## Docker
+#### Image
+Alapbeállításokkal:
+```
+docker build -t digionline https://github.com/droM4X/digionline.git
+```
+
+Egyedi beállításokkal (pl. csatorna szűrés, sorrend változtatása):
+
+```
+git clone https://github.com/droM4X/digionline.git
+cd digionline
+```
+Módosítod a channels könyvtárban amit szeretnél. Részletes leírás az ott található [readme.txt](channels/readme.txt) fájlban.
+Ha elkészültél a fájlok alapján az image elkészítése.
+```
+docker build -t digionline .
+```
+
+#### Container
+```
+docker run -d -p 9999:9999 --restart unless-stopped --env DOMAIN=IP_vagy_DOMAIN --env EMAIL=user@domain.hu --env PASSWORD=jelszo --name digionline digionline
+```
+Helyi hálózaton a szerver belső ip címét ajánlott használni.
+
+#### Frissítés (rebuild)
+Az Image-ben leírtak alapján a friss image elkészítése, majd
+
+```
+docker stop digionline
+docker rm digionline
+docker run -d -p 9999:9999 --restart unless-stopped --env DOMAIN=IP_vagy_DOMAIN --env EMAIL=user@domain.hu --env PASSWORD=jelszo --name digionline digionline
+```
+
+Az epg automatikusan frissül 12 óránként.
 
 ---
+
 ## STANDALONE debian/ubuntu/raspberry pi os rendszereken:
 `sudo -s` vagy `su`
 ```
@@ -22,28 +61,6 @@ chmod +x digionline_installer.sh
 ```
 
 A fentiek a /etc/crontab-ba, vagy a /etc/cron.d/-be egy fájlba.
-
-## Docker
-#### Image
-```
-docker build -t digionline https://github.com/droM4X/digionline.git
-```
-
-#### Container
-```
-docker run -d -p 9999:9999 --restart unless-stopped --env DOMAIN=IP_vagy_DOMAIN --env EMAIL=user@domain.hu --env PASSWORD=jelszo --name digionline digionline
-```
-Helyi hálózaton a szerver belső ip címét ajánlott használni.
-
-#### Frissítés (rebuild)
-```
-docker build -t digionline https://github.com/droM4X/digionline.git
-docker stop digionline
-docker rm digionline
-docker run -d -p 9999:9999 --restart unless-stopped --env DOMAIN=IP_vagy_DOMAIN --env EMAIL=user@domain.hu --env PASSWORD=jelszo --name digionline digionline
-```
-
-Az epg automatikusan frissül 12 óránként.
 
 ## Kimenetek
 
