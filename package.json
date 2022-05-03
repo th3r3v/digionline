@@ -1,6 +1,6 @@
 {
   "name": "digionline",
-  "version": "2.8.1",
+  "version": "2.8.2",
   "description": "Digionline servlet",
   "main": "main.js",
   "scripts": {
@@ -12,7 +12,7 @@
     "url": "git+https://github.com/droM4X/digionline.git"
   },
   "author": "Gabor Lengyel <csuwwi@gmail.com>",
-  "license": "ISC",
+  "license": "GPLv3",
   "bugs": {
     "url": "https://github.com/droM4X/digionline/issues"
   },
