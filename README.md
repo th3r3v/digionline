@@ -1,4 +1,9 @@
 # DIGI online servlet
+[![Github last commit](https://img.shields.io/github/last-commit/droM4X/digionline)](https://github.com/droM4X/digionline)
+[![Releases](https://img.shields.io/github/tag/droM4X/digionline.svg?style=flat-square)](https://github.com/droM4X/digionline/releases)
+[![License](https://img.shields.io/badge/license-GPLv3-blue)](./LICENSE.md) 
+[![GitHub Activity](https://img.shields.io/github/commit-activity/y/droM4X/digionline.svg?label=commits)](https://github.com/droM4X/digionline/commits)
+
 Ez egy forkja az eredeti verziónak, jobb docker támogatottsággal és gyorsabb EPG-vel.
 
 Az eredeti OMSC verzió + részletes leírást itt találod: https://github.com/szabbenjamin/digionline/
