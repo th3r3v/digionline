@@ -6,7 +6,7 @@
 
 Ez egy forkja az eredeti verziónak, jobb docker támogatottsággal és gyorsabb EPG-vel.
 
-Az eredeti OMSC verzió + részletes leírást itt találod: https://github.com/szabbenjamin/digionline/
+Az eredeti OSMC verzió + részletes leírást itt találod: https://github.com/szabbenjamin/digionline/
 
 ## Docker
 #### Image
