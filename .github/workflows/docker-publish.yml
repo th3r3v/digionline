@@ -58,5 +58,5 @@ jobs:
           file: ./Dockerfile
           platforms: linux/amd64,linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
-          tags: drom4x/digionline:latest
+          tags: droM4X/digionline:latest
           labels: ${{ steps.meta.outputs.labels }}
