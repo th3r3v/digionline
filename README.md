@@ -8,7 +8,29 @@ Ez egy forkja az eredeti verziónak, jobb docker támogatottsággal és gyorsabb
 
 Az eredeti OSMC verzió + részletes leírást itt találod: https://github.com/szabbenjamin/digionline/
 
-## Docker
+## Docker használat
+docker-compose fájl, pl. portainerhez
+
+```docker
+---
+version: "2"
+services:
+  digionline:
+    image: ghcr.io/drom4x/digionline:latest
+    container_name: digionline
+    environment:
+      - DOMAIN=
+      - EMAIL=
+      - PASSWORD=
+    ports:
+      - 9999:9999/tcp
+    restart: unless-stopped
+``` 
+
+Az environment-nél szereplő adatokat kell megadni idézőjelek nélkül! A domain a gép belső ip címe, pl.: DOMAIN=192.168.1.2
+
+Az email és password a digionline oldalon használt belépési adataid, amit a digi.hu oldalon állítottál be (nem a digi-s belépési adatok)
+
 #### Image
 Alapbeállításokkal:
 ```
