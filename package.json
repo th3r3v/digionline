@@ -1,6 +1,6 @@
 {
   "name": "digionline",
-  "version": "2.8.5",
+  "version": "2.8.6",
   "description": "Digionline servlet",
   "main": "main.js",
   "scripts": {
