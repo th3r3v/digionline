@@ -10,6 +10,8 @@ COPY . .
 RUN cp config.sample.ts config.ts && \
 # Replace localhost domain with environment variable DOMAIN
     sed -i "s/domain: 'localhost'/domain: process.env.DOMAIN/" config.ts && \
+# Replace localhost port with environment variable PORT
+    sed -i "s/port: 9999/port: process.env.PORT/" config.ts && \
 # Replace empty email with environment variable EMAIL
     sed -i "s/email: ''/email: process.env.EMAIL/" config.ts && \
 # Replace empty email with environment variable PASSWORD
@@ -27,7 +29,7 @@ RUN cp config.sample.ts config.ts && \
 # Create epg.xml
     touch epg.xml
 
-EXPOSE 9999
-HEALTHCHECK --timeout=3s CMD wget --no-verbose --tries=1 --spider http://localhost:9999/channels.csv || exit 1
+EXPOSE ${PORT:-9999}
+HEALTHCHECK --timeout=3s CMD wget --no-verbose --tries=1 --spider http://localhost:${PORT}/channels.csv || exit 1
 CMD [ "npm", "start" ]
 

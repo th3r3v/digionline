@@ -20,6 +20,7 @@ services:
     container_name: digionline
     environment:
       - DOMAIN=
+      - PORT=9999
       - EMAIL=
       - PASSWORD=
     ports:
