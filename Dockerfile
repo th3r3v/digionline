@@ -11,7 +11,7 @@ RUN cp config.sample.json config.json && \
 # Replace localhost domain with environment variable DOMAIN
     sed -i "s/domain: 'localhost'/domain: process.env.DOMAIN/" config.json && \
 # Replace localhost port with environment variable PORT
-    sed -i "s/port: 9999/port: process.env.PORT/" config.ts && \
+    sed -i "s/port: 9999/port: process.env.PORT/" config.json && \
 # Replace empty email with environment variable EMAIL
     sed -i "s/email: ''/email: process.env.EMAIL/" config.json && \
 # Replace empty email with environment variable PASSWORD
