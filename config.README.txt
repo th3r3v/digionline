@@ -17,13 +17,6 @@
         "password": "jelszo"
     },
 
-    /**
-     * futtatasi mod:
-     * standalone - normal mod
-     * docker - docker mod
-     */
-    "mode": "standalone",
-
     // EPG beallitasok
     "epg": {
         // true ha szuksegunk van EPG-re; false ha nem

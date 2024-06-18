@@ -215,13 +215,10 @@ class Epg {
             });
         }
 
-	if (Config.instance().mode === 'docker'){
-            setTimeout(function () {
-                Log.write('EPG refreshing...');
-                self.generateEpg();
-            }, Config.instance().epg.timeout * 60 * 60 * 1000);
-        }
-
+        setTimeout(function () {
+            Log.write('EPG refreshing...');
+            self.generateEpg();
+        }, Config.instance().epg.timeout * 60 * 60 * 1000);
     }
 }
 

@@ -18,8 +18,6 @@ RUN cp config.sample.json config.json && \
     sed -i "s/password: ''/password: process.env.PASSWORD/" config.json && \
 # Replace logging level to stdout instead of local logging
     sed -i "s/level: 'minimal'/level: 'stdout'/" config.json && \
-# Replace mode to docker
-    sed -i "s/mode: 'standalone'/mode: 'docker'/" config.json && \
 # Install production only dependencies
     npm install --only=production && \
 # Install typescript for conversion

@@ -8,7 +8,6 @@
         "email": "",
         "password": ""
     },
-    "mode": "standalone",
     "epg": {
         "needle": true,
         "timeout": 12
