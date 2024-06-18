@@ -28,8 +28,5 @@ export default class Config {
         if (parsedContent.login.email === '' || parsedContent.login.password === '') {
             throw new Error('Nincs megadva felhasználónév vagy jelszó!');
         }
-        if (['mai', 'heti'].indexOf(parsedContent.epg.type) === -1) {
-            throw new Error('Érvénytelen epg típus lett megadva. Választható: heti, napi');
-        }
     }
 }
