@@ -71,8 +71,8 @@ class Epg {
             .replace(':end', this.formatDate(endCorrect))
             .replace(':programmeName', this.escapeXml(programmeName))
             .replace(':programmeDesc', this.escapeXml(programmeDesc))
-            .replace(':startOffset', '+0100')
-            .replace(':endOffset', '+0100')
+            .replace(':startOffset', this.formatOffset(Common.getStaticTimeZoneOffset()))
+            .replace(':endOffset', this.formatOffset(Common.getStaticTimeZoneOffset()))
             ;
     }
 
@@ -102,6 +102,10 @@ class Epg {
         }
 
         return '' + year + month + day + hour + minute + second;
+    }
+
+    private formatOffset(offset: number) {
+        return `+${ offset.toString().padStart(2, "0").padEnd(4, "0") }`;
     }
 
     // https://stackoverflow.com/questions/7918868/how-to-escape-xml-entities-in-javascript
