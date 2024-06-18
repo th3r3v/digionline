@@ -1,7 +1,7 @@
-FROM node:10.15.3-alpine
+FROM node:lts-alpine
 
 # Create app directory
-WORKDIR /usr/src/app
+WORKDIR /app
 
 # Bundle app source
 COPY . .
@@ -10,28 +10,26 @@ COPY . .
 RUN cp config.sample.json config.json && \
 # Replace localhost domain with environment variable DOMAIN
     sed -i "s/domain: 'localhost'/domain: process.env.DOMAIN/" config.json && \
+# Replace localhost port with environment variable PORT
+    sed -i "s/port: 9999/port: process.env.PORT/" config.ts && \
 # Replace empty email with environment variable EMAIL
     sed -i "s/email: ''/email: process.env.EMAIL/" config.json && \
 # Replace empty email with environment variable PASSWORD
     sed -i "s/password: ''/password: process.env.PASSWORD/" config.json && \
+# Replace logging level to stdout instead of local logging
+    sed -i "s/level: 'minimal'/level: 'stdout'/" config.json && \
+# Replace mode to docker
+    sed -i "s/mode: 'standalone'/mode: 'docker'/" config.json && \
 # Install production only dependencies
     npm install --only=production && \
 # Install typescript for conversion
     npm install -g typescript && \
 # Convert typescript source to javascript
     npx tsc main.ts && \
-# Remove typescript
-    npm uninstall -g typescript && \
 # Create epg.xml
     touch epg.xml
 
-EXPOSE 9999
+EXPOSE ${PORT:-9999}
+HEALTHCHECK --timeout=3s CMD wget --no-verbose --tries=1 --spider http://localhost:${PORT}/channels.csv || exit 1
 CMD [ "npm", "start" ]
 
-# Build docker image:
-#   sudo docker build -t digionline https://github.com/szabbenjamin/digionline.git
-# Create and run docker container:
-#   sudo docker run -d -p 9999:9999 --restart unless-stopped --env DOMAIN=valami.local --env EMAIL=a@b.hu --env PASSWORD=jelszo --name container-digionline digionline
-# Kodi PVR IPTV Simple Client addon
-#   TV channel list: http://localhost:9999/channels_IPTV.m3u8
-#   TV EPG source: http://localhost:9999/epg.xml

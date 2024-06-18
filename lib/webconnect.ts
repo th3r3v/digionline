@@ -8,7 +8,7 @@ import Config from "./config";
 class Webconnect {
     private digi : Digionline;
     private server : any;
-    private translations : {oldIds : Array<number>, pairs : Array<{o : number, n : number}>};
+    private currentChannel : number;
 
     public constructor() {
         const filesAllowed = [
@@ -34,21 +34,19 @@ class Webconnect {
         });
 
         this.showServices(filesAllowed);
-
-        this.translations = this.initTranslate();
     }
 
     private showServices (filesAllowed : Array<string>) : void {
-        Log.write('===Elerheto csatornalista formatumok kulso lejatszokhoz===');
+        Log.write('Available channel list formats for external players');
         for (let file of filesAllowed) {
-            Log.write(`http://${Config.instance().webconnect.domain}:${Config.instance().webconnect.port}${file}`);
+            Log.write(`--> http://${Config.instance().webconnect.domain}:${Config.instance().webconnect.port}${file}`);
         }
     }
 
     public listen() : void {
         try {
             this.server.listen(Config.instance().webconnect.port);
-            Log.write('Server is listening');
+            Log.write('Server is up and listening');
         } catch (e) {
             Log.error(e);
         }
@@ -61,15 +59,17 @@ class Webconnect {
     private getChannel(get : string, response : any) : void {
         const self = this;
         let id : number = Number(get.replace('/channel/', '').replace('.m3u8', ''));
+        let channelId : string = 'id'+id;
+        let channelName: string = this.digi.channelOrder[channelId];
 
-        Log.write(`GET channel ${id}`);
+        if (Config.instance().log.level === 'full'){
+            Log.write(`GET channel ${channelName} (${id})`);
+        }
 
-        // ha olyan ID-t kap ami még egy régi rendszerezésből származik át kell forgatnunk az új ID-ra
-        if (this.translations.oldIds.indexOf(id) !== -1) {
-            Log.write('Ez egy regi rendszeru ID, frissitsd a listadat!');
-            let oldId = id;
-            id = this.getNewId(id);
-            Log.write(`Regi-uj ID atforgatas sikeres. oldId: ${oldId}, newId: ${id}`);
+        if (this.currentChannel !== id){
+            Log.write(`Channel change to ${channelName} (${id})`);
+            self.digi.hello(id, true);
+            this.currentChannel = id;
         }
 
         this.digi.getChannel(id, channel => {
@@ -78,11 +78,15 @@ class Webconnect {
                 let data = '';
                 proxyRes.on('data', function (chunk) {
                     data += chunk;
-                    Log.write('Buffering...', channel.id, channel.name, Common.getUrlVars(channel.url)['q']);
+                    if (Config.instance().log.level === 'full'){
+                        Log.write('Buffering...', channel.id, channel.name, Common.getUrlVars(channel.url)['q']);
+                    }
                 });
                 proxyRes.on('end', function () {
                     response.end(data);
-                    Log.write('Playing...', channel.id, channel.name, Common.getUrlVars(channel.url)['q']);
+                    if (Config.instance().log.level === 'full'){
+                        Log.write('Playing...', channel.id, channel.name, Common.getUrlVars(channel.url)['q']);
+                    }
                     self.digi.hello(channel.id);
                 });
                 proxyRes.on('error', function () {
@@ -93,42 +97,12 @@ class Webconnect {
     }
 
     private getFile(get: string, response : any) : void {
-        Log.write('file webrequested', get);
+        if (Config.instance().log.level === 'full'){
+            Log.write('file webrequested', get);
+        }
         const fileContent = FileHandler.readFile(`.${get}`).toString();
         response.write(fileContent);
         response.end();
-    }
-
-    /**
-     * Mivel megváltoztak a csatorna id-k így készült egy eljárás arra az esetre, hogy a régieket az új id-ra forgassa át
-     * Hasznos abban az esetben ha tvheadend-ben nem kívánjuk az összes csatornát egyesével átírkálni (én nem kívántam)
-     */
-    private initTranslate() : {oldIds : Array<number>, pairs : Array<{o : number, n : number}>} {
-        const oldIds = [],
-            pairs = FileHandler.readJsonFile('helpers/pairs.json') as Array<{o : number, n : number}>;
-
-        for (let row of pairs) {
-            oldIds.push(row.o);
-        }
-
-        return {
-            oldIds: oldIds,
-            pairs: pairs
-        }
-    }
-
-    private getNewId(oldId : number) : number {
-        if (this.translations.pairs.length === 0) {
-            throw new Error('Pairs array is empty');
-        }
-
-        for (let row of this.translations.pairs) {
-            if (row.o === oldId) {
-                return row.n;
-            }
-        }
-
-        throw new Error('oldId not exist');
     }
 }
 

@@ -16,25 +16,25 @@ const safeJsonParse = (json) => {
 }
 
 interface ChannelInterface {
-    name : string,
-    logoUrl : string,
-    id : number,
-    url : string | null,
+    name: string,
+    logoUrl: string,
+    id: number,
+    url: string | null,
     category: string,
     index: number,
 }
 
 interface PlayerInterface {
-    response : string,
-    loaded : Date
+    response: string,
+    loaded: Date
 }
 
 interface ChannelCategoryDictionary {
-    [categoryNumber: number] : string
+    [categoryNumber: number]: string
 }
 
-function getCategoryMapping(categories : HTMLSelectElement) : ChannelCategoryDictionary {
-    let categoryMapping : ChannelCategoryDictionary = {};
+function getCategoryMapping(categories: HTMLSelectElement): ChannelCategoryDictionary {
+    let categoryMapping: ChannelCategoryDictionary = {};
     if (!categories) {
         Log.write("Cannot fetch the channel categories!");
     }
@@ -52,29 +52,30 @@ function getCategoryMapping(categories : HTMLSelectElement) : ChannelCategoryDic
 }
 
 class Digionline {
-    private channelOrder : object = {};
-    private channelList : Array<ChannelInterface> = [];
-    private lastHello : Date;
-    private player : Array<PlayerInterface> = [];
-    private channel : ChannelInterface | null;
+    public channelOrder: object = {};
+    private channelHide: object = {};
+    private channelList: Array<ChannelInterface> = [];
+    private lastHello: Date;
+    private player: Array<PlayerInterface> = [];
+    private channel: ChannelInterface | null;
     private lastChannelId : number;
-    private userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.105 Safari/537.36';
+    private userAgent = 'Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36';
 
-    constructor(cb : () => void) {
+    constructor(cb: () => void) {
         this.login(success => {
             if (success) {
                 this.getChannelList(channelList => {
                     cb();
 
                     this.generateChannelList(() => {
-                        this.channelOrder = FileHandler.readJsonFile('helpers/epg_channel_urls.json') as Object;
+                        this.channelOrder = FileHandler.getChannelConfigFile('channels/channel_order.json', 'channels/channel_order.dist.json') as Object;
+                        this.channelHide = FileHandler.getChannelConfigFile('channels/channel_hide.json', 'channels/channel_hide.dist.json') as Object;
                         this.lastChannelId = Number(Object.keys(this.channelOrder)[0].replace('id', ''));
                         this.initWatchdog();
                     });
 
                     if (Config.instance().epg.needle) {
                         const epgEngine = new Epg();
-                        epgEngine.setChannels(channelList);
                         epgEngine.generateEpg();
                     }
                 });
@@ -84,8 +85,8 @@ class Digionline {
         this.channel = null;
     }
 
-    private login(cb : (success : boolean) => void) : void {
-        Log.write('Login digionline.hu');
+    private login(cb: (success: boolean) => void): void {
+        Log.write('Login to digionline.hu');
         Common.request({
             uri: 'https://digionline.hu/login',
             method: 'GET',
@@ -112,11 +113,11 @@ Reszletek: https://github.com/szabbenjamin/digionline/issues/25
 #########################################
                 
                 `);
-                Log.error('Token hiba.');
+                Log.error('Token error.');
                 process.exit();
             }
 
-            const token : string = tokenElement.value;
+            const token: string = tokenElement.value;
             Common.request({
                 uri: 'https://digionline.hu/login',
                 method: 'POST',
@@ -133,10 +134,9 @@ Reszletek: https://github.com/szabbenjamin/digionline/issues/25
                 this.checkLoggedIn(loggedIn => {
                     if (loggedIn) {
                         Log.write(`Logged in: ${Config.instance().login.email}`);
-                        this.donateMeMsg();
                     }
                     else {
-                        Log.error(`Sikertelen belepes (helyes a felhasznalonev es jelszo?)`, '1');
+                        Log.error(`!!! Login error. (Check your account credentials)`, '1');
                     }
                     cb(loggedIn);
                 });
@@ -148,7 +148,7 @@ Reszletek: https://github.com/szabbenjamin/digionline/issues/25
      * cb-ben visszaadjuk be vagyunk-e már jelentkezve
      * @param loggedIn
      */
-    public checkLoggedIn(loggedIn : (loggedIn : boolean) => void) : void {
+    public checkLoggedIn(loggedIn: (loggedIn: boolean) => void): void {
         Common.request({
             uri: 'https://digionline.hu/',
             method: 'GET',
@@ -167,7 +167,7 @@ Reszletek: https://github.com/szabbenjamin/digionline/issues/25
         });
     }
 
-    public getChannelList(cb : (channelList : Array<ChannelInterface>) => void) : void {
+    public getChannelList(cb: (channelList: Array<ChannelInterface>) => void): void {
         Log.write('Loading channel list...');
         Common.request({
             uri: 'https://digionline.hu/csatornak',
@@ -182,33 +182,35 @@ Reszletek: https://github.com/szabbenjamin/digionline/issues/25
             const categoryMapping = getCategoryMapping(categories);
 
             dom.window.document.querySelectorAll('.channel').forEach(channelBox => {
-                const name : string = channelBox.querySelector('.channels__name').textContent.trim();
-                const logoUrl : string = channelBox.querySelector('img').src;
-                const id : number = Number(channelBox.querySelector('.favorite').getAttribute('data-id'));
-                const categoryNumber : number = Number(channelBox.getAttribute('data-category'));
-                const category : string = ((categoryNumber in categoryMapping) ?
+                const name: string = channelBox.querySelector('.channels__name').textContent.trim();
+                const logoUrl: string = channelBox.querySelector('img').src;
+                const id: number = Number(channelBox.querySelector('.favorite').getAttribute('data-id'));
+                const categoryNumber: number = Number(channelBox.getAttribute('data-category'));
+                const category: string = ((categoryNumber in categoryMapping) ?
                     categoryMapping[categoryNumber] : String(categoryNumber));
 
                 const index = Object.keys(this.channelOrder).indexOf('id' + id);
 
-                this.channelList.push({
-                    name: name,
-                    logoUrl: logoUrl,
-                    id: id,
-                    url: null,
-                    category: category,
-                    index: index
-                });
+                if (Object.keys(this.channelHide).indexOf('id' + id) === -1) {
+                    this.channelList.push({
+                        name: name,
+                        logoUrl: logoUrl,
+                        id: id,
+                        url: null,
+                        category: category,
+                        index: index
+                    });
+                }
             });
 
             this.channelList.sort((a, b) => a.index - b.index);
 
-            Log.write(`Channels loaded`, this.channelList.length);
+            Log.write(`Channels loaded. Found channels: `, this.channelList.length);
             cb(this.channelList);
         });
     }
 
-    private generateChannelList(cb : () => void) : void {
+    private generateChannelList(cb : () => void): void {
         Log.write('Generating channel list...', '.m3u8');
         let simpleIPTVList = `#EXTM3U tvg-shift="${Common.getStaticTimeZoneOffset()}"\n`,
             tvheadendList = simpleIPTVList,
@@ -237,7 +239,7 @@ Reszletek: https://github.com/szabbenjamin/digionline/issues/25
         cb();
     }
 
-    private getChannelById(id : number) : ChannelInterface {
+    private getChannelById(id: number): ChannelInterface {
         const cl = this.channelList;
         for (let i in cl) {
             if (cl[i].id === id) {
@@ -249,15 +251,17 @@ Reszletek: https://github.com/szabbenjamin/digionline/issues/25
         throw new Error();
     }
 
-    private getStampedChannel() : ChannelInterface {
+    private getStampedChannel(): ChannelInterface {
         const timestamp = Math.floor(Date.now() / 1000);
         this.channel.url = `${this.channel.url.split('&_t=')[0]}&_t=${timestamp}`;
         return this.channel;
     }
 
-    public getChannel(id, cb : (channel : ChannelInterface) => void) : void {
+    public getChannel(id, cb: (channel: ChannelInterface) => void): void {
         if (this.channel && this.channel.id === id) {
-            Log.write('Channel full cache', id, this.channel.name);
+            if (Config.instance().log.level === 'full') {
+                Log.write('Channel full cache', id, this.channel.name);
+            }
             cb(this.getStampedChannel());
             return;
         }
@@ -269,7 +273,7 @@ Reszletek: https://github.com/szabbenjamin/digionline/issues/25
             const playlistExtension = ".m3u8";
 
             if (response.indexOf('404 - Tartalom nem található') !== -1) {
-                Log.error('Channel id is not found.');
+                Log.error('!!! Error: Channel ID is not found.');
                 return;
             }
 
@@ -294,7 +298,7 @@ Reszletek: https://github.com/szabbenjamin/digionline/issues/25
                     'User-Agent': this.userAgent
                 }
             }, playlistContent => {
-                const streams : Array<string> = [];
+                const streams: Array<string> = [];
                 let videoStreamUrl = '';
 
                 playlistContent.split('\n').forEach(row => {
@@ -316,7 +320,7 @@ Reszletek: https://github.com/szabbenjamin/digionline/issues/25
                         'User-Agent': this.userAgent
                     }
                 }, response => {
-                    if (response.length < 10) {
+                    if (response && response.length < 10) {
                         searchChannel(streams, response => {
                             channel.url = response;
                             this.channel = channel;
@@ -333,7 +337,7 @@ Reszletek: https://github.com/szabbenjamin/digionline/issues/25
 
         function searchChannel(streams: Array<string>, cb: (response: string) => void) {
             if (!streams.length) {
-                Log.error('Adashiba: a csatorna nem mukodik.');
+                Log.error('!!! Stream Error: No input given.');
                 cb('');
                 return;
             }
@@ -346,11 +350,11 @@ Reszletek: https://github.com/szabbenjamin/digionline/issues/25
                     'User-Agent': this.userAgent
                 }
             }, response => {
-                if (response.length > 10) {
+                if (response && response.length > 10) {
                     cb(stream);
                 }
                 else {
-                    Log.write(`Adashiba: nincs jel!`, Common.getUrlVars(stream)['q']);
+                    Log.write(`!!! Stream Error: no input given!`, Common.getUrlVars(stream)['q']);
                     searchChannel(streams, cb);
                 }
             });
@@ -358,8 +362,8 @@ Reszletek: https://github.com/szabbenjamin/digionline/issues/25
 
         const channelKey = `id_${id}`;
         if (typeof this.player[channelKey] === 'undefined'
-        || (typeof this.player[channelKey] !== 'undefined'
-         && Common.diffTime(this.player[channelKey].loaded, new Date()) > 5)) {
+            || (typeof this.player[channelKey] !== 'undefined'
+                && Common.diffTime(this.player[channelKey].loaded, new Date()) > 5)) {
             Common.request({
                 uri: `https://digionline.hu/player/${id}`,
                 method: 'GET',
@@ -370,27 +374,27 @@ Reszletek: https://github.com/szabbenjamin/digionline/issues/25
                 loadChannel(response);
                 this.player[channelKey] = {
                     loaded: new Date(),
-                    response : response
+                    response: response
                 };
-                Log.write('loaded from request', channelKey);
+                if (Config.instance().log.level === 'full') {
+                    Log.write('Loaded from request', channelKey);
+                }
             });
         }
         else {
-            Log.write(`loaded from cache`, channelKey);
+            if (Config.instance().log.level === 'full') {
+                Log.write(`Loaded from cache`, channelKey);
+            }
             loadChannel(this.player[channelKey].response);
         }
-    }
-
-    private donateMeMsg() : void {
-        console.log('@\n@\n@\n@\n@ Ha támogatni szeretnéd a munkámat (vagy meg szeretnél hívni egy sörre, kávéra) Paypal-on van erre lehetőséged: https://paypal.me/dicsportal\n@\n@\n@');
     }
 
     /**
      * kapcsolat fenntartása (kössz a segítséget! :D)
      * @param id
      */
-    public hello(id : number) : void {
-        if (Common.diffTime(new Date(), this.lastHello) > 30) {
+    public hello(id: number, force: boolean = false): void {
+        if (Common.diffTime(new Date(), this.lastHello) >= 270 || force === true) {
             Common.request({
                 uri: `https://digionline.hu/refresh?id=${id}`,
                 method: 'GET',
@@ -401,14 +405,15 @@ Reszletek: https://github.com/szabbenjamin/digionline/issues/25
                 }
             }, response => {
                 const r = safeJsonParse(response);
-                Log.write(r);
                 if (Object(r).error === true) {
+                    Log.write('!!! Error', Object(r).message)
                     this.login(() => {
                         this.channel = null;
                         Log.write('Logged in');
                     });
+                } else {
+                    Log.write('Keep-alive packet sent');
                 }
-                Log.write('Hello packet sent...', response);
             });
             this.lastHello = new Date();
         }
@@ -416,12 +421,15 @@ Reszletek: https://github.com/szabbenjamin/digionline/issues/25
 
     private initWatchdog() : void {
         setInterval(() => {
+            // 270 in droM4X/digionline
             if (Common.diffTime(new Date(), Common.lastRequest) > 60) {
-                Log.write('Watchdog...');
-                this.hello(this.lastChannelId);
+                if (Config.instance().log.level === 'full') {
+                    Log.write('Watchdog...');
+                }
+                this.hello(this.lastChannelId, true);
             }
         }, 20 * 1000);
     }
 }
 
-export {Digionline, ChannelInterface, PlayerInterface};
+export { Digionline, ChannelInterface, PlayerInterface };

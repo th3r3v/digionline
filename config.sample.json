@@ -8,11 +8,13 @@
         "email": "",
         "password": ""
     },
+    "mode": "standalone",
     "epg": {
         "needle": true,
-        "forceUpdate": false,
-        "timeout": 72,
-        "type": "heti"
+        "timeout": 12
+    },
+    "log": {
+        "level": "minimal"
     },
     "secureConnection": true
 }

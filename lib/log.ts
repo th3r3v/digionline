@@ -1,3 +1,4 @@
+import Config from "./config";
 import FileHandler from "./file";
 const findRemoveSync = require("find-remove");
 
@@ -7,7 +8,10 @@ class Log {
         const isoDateString = today.toISOString().substring(0, 10);
 
         console.log((new Date()).toString(), input);
-        FileHandler.appendFile(`log/${isoDateString}.log`, `${(new Date()).toString()} # ${JSON.stringify(input)}`);
+        
+        if (Config.instance().log.level !== 'stdout') {
+            FileHandler.appendFile(`log/${isoDateString}.log`, `${(new Date()).toString()} # ${JSON.stringify(input)}`);
+        }
     }
 
     public static error (...input) : void {
@@ -19,8 +23,8 @@ class Log {
     }
 
     public static janitor(): void {
-        Log.write("7 napnal regebbi logfajlok torlese...");
         findRemoveSync("log/", { extensions: [".log"], age: { seconds: 604800 } });
+        Log.write("Deleting log files which are older than 7 days successful");
 
         // naponta ismetlodhet
         setTimeout(function () {
