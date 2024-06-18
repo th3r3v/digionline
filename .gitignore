@@ -62,8 +62,6 @@ typings/
 # PhpStorm ignore
 .idea
 
-# Config
-config.ts
 
 # Typescript specific
 *.js
@@ -80,3 +78,7 @@ digionline.sh
 digionline.service
 channels/channel_order.json
 channels/channel_hide.json
+
+
+# Config
+config.json

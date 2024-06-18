@@ -1,11 +1,19 @@
 import Common from "./common";
-import CONFIG from "../config";
 import Log from "./log";
 import * as jsdom from 'jsdom';
 import FileHandler from "./file";
 import Epg from "./epg";
+import Config from "./config";
 
 const { JSDOM } = jsdom;
+
+const safeJsonParse = (json) => {
+    try {
+        return JSON.parse(json);
+    } catch (e) {
+        return { error: true };
+    }
+}
 
 interface ChannelInterface {
     name: string,
@@ -58,7 +66,7 @@ class Digionline {
             if (success) {
                 this.getChannelList(channelList => {
                     cb();
-                    
+
                     this.generateChannelList(() => {
                         this.channelOrder = FileHandler.getChannelConfigFile('channels/channel_order.json', 'channels/channel_order.dist.json') as Object;
                         this.channelHide = FileHandler.getChannelConfigFile('channels/channel_hide.json', 'channels/channel_hide.dist.json') as Object;
@@ -66,7 +74,7 @@ class Digionline {
                         this.initWatchdog();
                     });
 
-                    if (CONFIG.epg.needle) {
+                    if (Config.instance().epg.needle) {
                         const epgEngine = new Epg();
                         epgEngine.generateEpg();
                     }
@@ -115,8 +123,8 @@ Reszletek: https://github.com/szabbenjamin/digionline/issues/25
                 method: 'POST',
                 formData: {
                     '_token': token,
-                    email: CONFIG.login.email,
-                    password: CONFIG.login.password,
+                    email: Config.instance().login.email,
+                    password: Config.instance().login.password,
                     accept: '1'
                 },
                 headers: {
@@ -125,7 +133,7 @@ Reszletek: https://github.com/szabbenjamin/digionline/issues/25
             }, response => {
                 this.checkLoggedIn(loggedIn => {
                     if (loggedIn) {
-                        Log.write(`Logged in: ${CONFIG.login.email}`);
+                        Log.write(`Logged in: ${Config.instance().login.email}`);
                     }
                     else {
                         Log.error(`!!! Login error. (Check your account credentials)`, '1');
@@ -151,7 +159,7 @@ Reszletek: https://github.com/szabbenjamin/digionline/issues/25
             const dom = new JSDOM(response);
             if (dom.window.document.querySelector('.in-user')) {
                 const loggedEmail = dom.window.document.querySelector('.in-user').textContent.trim();
-                loggedIn(loggedEmail === CONFIG.login.email);
+                loggedIn(loggedEmail === Config.instance().login.email);
             }
             else {
                 loggedIn(false);
@@ -210,7 +218,7 @@ Reszletek: https://github.com/szabbenjamin/digionline/issues/25
 
         this.channelList.forEach(channel => {
             const header = `#EXTINF:-${channel.id} tvg-id="id${channel.id}" tvg-name="${channel.name}" tvg-logo="${channel.logoUrl}" group-title="${channel.category}", ${channel.name} \n`,
-                url = `http://${CONFIG.webconnect.domain}:${CONFIG.webconnect.port}/channel/${channel.id}.m3u8`;
+                url = `http://${Config.instance().webconnect.domain}:${Config.instance().webconnect.port}/channel/${channel.id}.m3u8`;
 
             // for Simple IPTV plugin
             simpleIPTVList += header;
@@ -251,7 +259,7 @@ Reszletek: https://github.com/szabbenjamin/digionline/issues/25
 
     public getChannel(id, cb: (channel: ChannelInterface) => void): void {
         if (this.channel && this.channel.id === id) {
-            if (CONFIG.log.level === 'full') {
+            if (Config.instance().log.level === 'full') {
                 Log.write('Channel full cache', id, this.channel.name);
             }
             cb(this.getStampedChannel());
@@ -296,7 +304,7 @@ Reszletek: https://github.com/szabbenjamin/digionline/issues/25
                 playlistContent.split('\n').forEach(row => {
                     if (row.substring(0, 5) === 'https') {
                         streams.push(row);
-                        if (row.indexOf(`&q=${CONFIG.videoQuality}`) !== -1) {
+                        if (row.indexOf(`&q=${Config.instance().videoQuality}`) !== -1) {
                             videoStreamUrl = row;
                         }
                     }
@@ -368,13 +376,13 @@ Reszletek: https://github.com/szabbenjamin/digionline/issues/25
                     loaded: new Date(),
                     response: response
                 };
-                if (CONFIG.log.level === 'full') {
+                if (Config.instance().log.level === 'full') {
                     Log.write('Loaded from request', channelKey);
                 }
             });
         }
         else {
-            if (CONFIG.log.level === 'full') {
+            if (Config.instance().log.level === 'full') {
                 Log.write(`Loaded from cache`, channelKey);
             }
             loadChannel(this.player[channelKey].response);
@@ -396,7 +404,7 @@ Reszletek: https://github.com/szabbenjamin/digionline/issues/25
                     'User-Agent': this.userAgent
                 }
             }, response => {
-                const r = JSON.parse(response);
+                const r = safeJsonParse(response);
                 if (Object(r).error === true) {
                     Log.write('!!! Error', Object(r).message)
                     this.login(() => {
@@ -413,8 +421,9 @@ Reszletek: https://github.com/szabbenjamin/digionline/issues/25
 
     private initWatchdog() : void {
         setInterval(() => {
-            if (Common.diffTime(new Date(), Common.lastRequest) > 270) {
-                if (CONFIG.log.level === 'full') {
+            // 270 in droM4X/digionline
+            if (Common.diffTime(new Date(), Common.lastRequest) > 60) {
+                if (Config.instance().log.level === 'full') {
                     Log.write('Watchdog...');
                 }
                 this.hello(this.lastChannelId, true);

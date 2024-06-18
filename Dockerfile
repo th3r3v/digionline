@@ -6,20 +6,20 @@ WORKDIR /app
 # Bundle app source
 COPY . .
 
-# Create config.ts from the sample
-RUN cp config.sample.ts config.ts && \
+# Create config.json from the sample
+RUN cp config.sample.json config.json && \
 # Replace localhost domain with environment variable DOMAIN
-    sed -i "s/domain: 'localhost'/domain: process.env.DOMAIN/" config.ts && \
+    sed -i "s/domain: 'localhost'/domain: process.env.DOMAIN/" config.json && \
 # Replace localhost port with environment variable PORT
     sed -i "s/port: 9999/port: process.env.PORT/" config.ts && \
 # Replace empty email with environment variable EMAIL
-    sed -i "s/email: ''/email: process.env.EMAIL/" config.ts && \
+    sed -i "s/email: ''/email: process.env.EMAIL/" config.json && \
 # Replace empty email with environment variable PASSWORD
-    sed -i "s/password: ''/password: process.env.PASSWORD/" config.ts && \
+    sed -i "s/password: ''/password: process.env.PASSWORD/" config.json && \
 # Replace logging level to stdout instead of local logging
-    sed -i "s/level: 'minimal'/level: 'stdout'/" config.ts && \
+    sed -i "s/level: 'minimal'/level: 'stdout'/" config.json && \
 # Replace mode to docker
-    sed -i "s/mode: 'standalone'/mode: 'docker'/" config.ts && \
+    sed -i "s/mode: 'standalone'/mode: 'docker'/" config.json && \
 # Install production only dependencies
     npm install --only=production && \
 # Install typescript for conversion

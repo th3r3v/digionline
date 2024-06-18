@@ -1,7 +1,7 @@
 import Common from "./common";
-import CONFIG from "../config";
 import Log from "./log";
 import FileHandler from "./file";
+import Config from "./config";
 
 const atob = require('atob');
 const jsdom = require("jsdom");
@@ -79,25 +79,25 @@ class Epg {
     private formatDate(date) {
         let d = new Date(date);
         let year = d.getFullYear();
-        let month: any = d.getMonth() + 1;
-        let day: any = d.getDate();
-        let hour: any = d.getHours();
-        let minute: any = d.getMinutes();
-        let second: any = d.getSeconds();
+        let month= String(d.getMonth() + 1);
+        let day= String(d.getDate());
+        let hour= String(d.getHours());
+        let minute= String(d.getMinutes());
+        let second= String(d.getSeconds());
 
-        if (month.toString().length == 1) {
+        if (month.length == 1) {
             month = '0' + month;
         }
-        if (day.toString().length == 1) {
+        if (day.length == 1) {
             day = '0' + day;
         }
-        if (hour.toString().length == 1) {
+        if (hour.length == 1) {
             hour = '0' + hour;
         }
-        if (minute.toString().length == 1) {
+        if (minute.length == 1) {
             minute = '0' + minute;
         }
-        if (second.toString().length == 1) {
+        if (second.length == 1) {
             second = '0' + second;
         }
 
@@ -215,11 +215,12 @@ class Epg {
             });
         }
 
-	if (CONFIG.mode === 'docker'){
+	if (Config.instance().mode === 'docker'){
             setTimeout(function () {
                 Log.write('EPG refreshing...');
                 self.generateEpg();
             }, 12 * 60 * 60 * 1000);
+            //}, Config.instance().epg.timeout * 60 * 60 * 1000);
         }
 
     }

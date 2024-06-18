@@ -1,9 +1,9 @@
 import * as http from 'http';
 import {Digionline} from "./digionline";
 import Log from "./log";
-import CONFIG from "../config";
 import FileHandler from "./file";
 import Common from "./common";
+import Config from "./config";
 
 class Webconnect {
     private digi : Digionline;
@@ -39,13 +39,13 @@ class Webconnect {
     private showServices (filesAllowed : Array<string>) : void {
         Log.write('Available channel list formats for external players');
         for (let file of filesAllowed) {
-            Log.write(`--> http://${CONFIG.webconnect.domain}:${CONFIG.webconnect.port}${file}`);
+            Log.write(`--> http://${Config.instance().webconnect.domain}:${Config.instance().webconnect.port}${file}`);
         }
     }
 
     public listen() : void {
         try {
-            this.server.listen(CONFIG.webconnect.port);
+            this.server.listen(Config.instance().webconnect.port);
             Log.write('Server is up and listening');
         } catch (e) {
             Log.error(e);
@@ -61,8 +61,8 @@ class Webconnect {
         let id : number = Number(get.replace('/channel/', '').replace('.m3u8', ''));
         let channelId : string = 'id'+id;
         let channelName: string = this.digi.channelOrder[channelId];
-    
-        if (CONFIG.log.level === 'full'){
+
+        if (Config.instance().log.level === 'full'){
             Log.write(`GET channel ${channelName} (${id})`);
         }
 
@@ -78,13 +78,13 @@ class Webconnect {
                 let data = '';
                 proxyRes.on('data', function (chunk) {
                     data += chunk;
-                    if (CONFIG.log.level === 'full'){
+                    if (Config.instance().log.level === 'full'){
                         Log.write('Buffering...', channel.id, channel.name, Common.getUrlVars(channel.url)['q']);
                     }
                 });
                 proxyRes.on('end', function () {
                     response.end(data);
-                    if (CONFIG.log.level === 'full'){
+                    if (Config.instance().log.level === 'full'){
                         Log.write('Playing...', channel.id, channel.name, Common.getUrlVars(channel.url)['q']);
                     }
                     self.digi.hello(channel.id);
@@ -97,7 +97,7 @@ class Webconnect {
     }
 
     private getFile(get: string, response : any) : void {
-        if (CONFIG.log.level === 'full'){
+        if (Config.instance().log.level === 'full'){
             Log.write('file webrequested', get);
         }
         const fileContent = FileHandler.readFile(`.${get}`).toString();
