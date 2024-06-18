@@ -219,8 +219,7 @@ class Epg {
             setTimeout(function () {
                 Log.write('EPG refreshing...');
                 self.generateEpg();
-            }, 12 * 60 * 60 * 1000);
-            //}, Config.instance().epg.timeout * 60 * 60 * 1000);
+            }, Config.instance().epg.timeout * 60 * 60 * 1000);
         }
 
     }

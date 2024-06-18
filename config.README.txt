@@ -28,12 +28,17 @@
     "epg": {
         // true ha szuksegunk van EPG-re; false ha nem
         "needle": true,
-        // minden inditaskor generaljunk EPG-t?
-        "forceUpdate": false,
         // EPG idohatar oraban
-        "timeout": 72,
-        // heti vagy aznapi lista letoltese: "mai"|"heti"
-        "type": "heti"
+        "timeout": 12
+    },
+
+    // Log
+    log: {
+        // mit logoljuk?
+        // stdout = csak a kimenetre (docker mod)
+        // minimal = hibak, bejelentkezes, csatorna lejatszas
+        // full = minimal + elotoltesi infok
+        level: 'minimal'
     },
 
     // Log

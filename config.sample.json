@@ -11,7 +11,7 @@
     "mode": "standalone",
     "epg": {
         "needle": true,
-        "timeout": 72
+        "timeout": 12
     },
     "log": {
         "level": "minimal"
